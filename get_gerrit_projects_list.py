@@ -11,7 +11,7 @@ import requests
 
 
 LOG = logging.getLogger(__name__)
-PROJECTS_EXCLUDE = ["ip", "work", "test", "ansible"]
+PROJECTS_EXCLUDE = ["ip", "work", "test", "ansible", "rox", "ada"]
 
 
 def setup_logging(debug=False):
