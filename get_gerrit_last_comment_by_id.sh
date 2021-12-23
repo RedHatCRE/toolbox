@@ -52,13 +52,10 @@ if [ -z "$ssh_key_path" ]; then
     { echo 'Missing -s parameter: --ssh_key_path' ; exit 2; }
 fi
 
-# We should slurp the output with `jq`. The query comments always return 2 json without division
-ssh -p "$port" "$gerrit_server" gerrit query --comments --current-patch-set "$id" --format=JSON \ | 
-    jq --raw-output --exit-status --slurp '
-    .[0].comments 
-    | last 
-    | .message'
 
-if [ $? -ne 0 ]; then
-     { echo "Error retrieving data from gerrit."; exit $?; }
-fi
+review_data=$(ssh -p "$port" "$gerrit_server" gerrit query --comments --current-patch-set "$id" --format=json)
+# We should slurp the output with `jq`. The query comments always return 2 json without division if the review exist. If it doesn't then it returns one json always.
+jq --raw-output --exit-status --slurp -e '
+                                         .[0].comments 
+                                         | last 
+                                         | .message // "This review does not have comments"' <<< "$review_data"
