@@ -19,7 +19,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         -p|--port) 
-            [[ -z $2 ]] && port=22 || port=$2
+            port=${2:-22}
             shift
             ;;
         -i|--id) 
