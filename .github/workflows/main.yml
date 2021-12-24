@@ -10,9 +10,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2.0.0
-    - name: Tests
-      run: |
-          apt-get update -yqq
-          apt-get install shellcheck -yqq
-          shellcheck --shell=bash *.sh
-          tox -v
+    - name: Package installation 
+      run: apt-get update -y && apt-get install -y shellcheck
+    - name: Shellcheck call tests
+      run: shellcheck --shell=bash *.sh
+    - name: Tox call tests
+      run: tox -v
