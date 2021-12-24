@@ -71,13 +71,13 @@ fi
 review_data=$(ssh -p "$port" "$gerrit_host" gerrit query --comments --current-patch-set change:"$change_number" --format=json commentby:"$gerrit_username" --format=JSON)
 
 # Gerrit returns error
-if jq -e 'select(.type=="error")' <<< $review_data
+if jq -e 'select(.type=="error")' <<< "$review_data"
 then
     exit 1
 fi
 
 # There is no data
-if jq -e 'select(.rowCount==0)' <<< $review_data
+if jq -e 'select(.rowCount==0)' <<< "$review_data"
 then
     exit 1
 fi
@@ -86,4 +86,4 @@ jq -r --raw-output --exit-status "
                                  [.comments 
                                  | .[] 
                                  | select(.reviewer.username==\"$gerrit_username\")] 
-                                 | last.message" <<< $review_data
+                                 | last.message" <<< "$review_data"
