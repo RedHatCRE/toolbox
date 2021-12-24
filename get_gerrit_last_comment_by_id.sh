@@ -6,11 +6,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 usage() { 
-    echo "Usage: $0 [-u|--gerrit_server HOST] [-p|--port NUM] [-i|--id NUM] [-s|--ssh_key_path PATH]"
+    echo "Usage: $0 [-u|--gerrit_server HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH]"
     exit 2
 }
 
-declare gerrit_server port id ssh_key_path
+declare gerrit_server port change_number ssh_key_path
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -22,8 +22,8 @@ while [ $# -gt 0 ]; do
             port=${2:-22}
             shift
             ;;
-        -i|--id) 
-            id=$2
+        -c|--change_number) 
+            change_number=$2
             shift
             ;;
         -s|--ssh_key_path)
@@ -49,8 +49,8 @@ if [ -z "$gerrit_server" ]; then
     exit 2
 fi
 
-if [ -z "$id" ]; then
-    echo 'Missing -i parameter: --id'
+if [ -z "$change_number" ]; then
+    echo 'Missing -c parameter: --change_number'
     exit 2
 fi
 
@@ -60,7 +60,7 @@ if [ -z "$ssh_key_path" ]; then
 fi
 
 
-review_data=$(ssh -p "$port" "$gerrit_server" gerrit query --comments --current-patch-set "$id" --format=json)
+review_data=$(ssh -p "$port" "$gerrit_server" gerrit query --comments --current-patch-set "$change_number" --format=json)
 # We should slurp the output with `jq`. The query comments always return 2 json without division if the review exist. If it doesn't then it returns one json always.
 jq --raw-output --exit-status --slurp '
                                       .[0].comments 
