@@ -82,8 +82,10 @@ then
     exit 1
 fi
 
+comment_rows=$(echo "$review_data" | head -n1)
+
 jq -r --raw-output --exit-status "
                                  [.comments 
                                  | .[] 
                                  | select(.reviewer.username==\"$gerrit_username\")] 
-                                 | last.message" <<< "$review_data"
+                                 | last.message" <<< "$comment_rows"
