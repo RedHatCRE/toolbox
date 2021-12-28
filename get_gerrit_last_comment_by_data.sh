@@ -63,7 +63,7 @@ if [ -z "$ssh_key_path" ]; then
     exit 2
 fi
 
-if [ -z "$ssh_key_path" ]; then
+if [ -z "$gerrit_username" ]; then
     echo 'Missing -u parameter: --gerrit_username'
     exit 2
 fi
