@@ -88,4 +88,7 @@ jq -r --raw-output --exit-status "
                                  [.comments 
                                  | .[] 
                                  | select(.reviewer.username==\"$gerrit_username\")] 
-                                 | last.message" <<< "$comment_rows"
+                                 | last.message" <<< "$comment_rows" \
+| awk '/^-/{print $2,$3,$5}' \
+| column --table --table-columns TEST_NAME,URL,STATUS --json --table-name data
+

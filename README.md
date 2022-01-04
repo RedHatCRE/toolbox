@@ -11,7 +11,7 @@ This tool is used to extract the information in the last comment of a Gerrit rev
 Usage:
 
 ```
-$ ./get_gerrit_last_comment_by_id.sh -h
-Usage: get_gerrit_last_comment_by_data.sh [-h|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]
+$ ./get_gerrit_last_comment_by_data.sh --help
+Usage: ./get_gerrit_last_comment_by_data.sh [-h|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]
 ```
 
