@@ -12,6 +12,7 @@ Usage:
 
 ```
 $ ./get_gerrit_last_comment_by_data.sh --help
-Usage: ./get_gerrit_last_comment_by_data.sh [-h|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]
+Usage: ./get_gerrit_last_comment_by_data.sh [-H|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]
 ```
+
 

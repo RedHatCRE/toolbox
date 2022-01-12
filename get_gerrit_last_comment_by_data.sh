@@ -6,7 +6,7 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 usage() { 
-    echo "Usage: $0 [-h|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]"
+    echo "Usage: $0 [-H|--gerrit_host HOST] [-p|--port NUM] [-c|--change_number NUM] [-s|--ssh_key_path PATH] [-u|--gerrit_username USERNAME]"
     exit 2
 }
 
@@ -14,7 +14,7 @@ declare gerrit_host port change_number ssh_key_path gerrit_username
 
 while [ $# -gt 0 ]; do
     case $1 in
-        -h|--gerrit_host)
+        -H|--gerrit_host)
             gerrit_host=$2
             shift
             ;;
@@ -49,7 +49,7 @@ if [[ -z $port ]]; then
 fi
 
 if [ -z "$gerrit_host" ]; then
-    echo 'Missing -h parameter: --gerrit_host'
+    echo 'Missing -H parameter: --gerrit_host'
     exit 2
 fi
 
