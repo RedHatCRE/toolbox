@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! command -v jq >/dev/null 2>&1; then
+if ! type jq >/dev/null 2>&1; then
     echo >&2 "I require jq but it's not installed. Aborting."
     exit 1
 fi
