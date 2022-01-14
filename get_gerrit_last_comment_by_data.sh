@@ -77,7 +77,7 @@ if [ -z "$change_number" ]; then
 fi
 
 ssh_command=("ssh" "-p" "$port" "$ssh_user@$gerrit_host")
-gerrit_command=( "gerrit" "query" "--comments" "change:$change_number" "--format=json" "commentby:$gerrit_username" "--format=JSON")
+gerrit_command=( "gerrit" "query" "--comments" "change:$change_number" "--format=json" "commentby:$gerrit_username")
 
 if [ ! -z "$ssh_key_path" ]; then
     if [ ! -f "$ssh_key_path" ]; then
