@@ -123,5 +123,5 @@ data=$(echo "$last_comment" | column --table --table-columns TEST_NAME,URL,STATU
 jq -n --arg project_name "$project_name"  \
       --arg change_id "$change_number"    \
       --argjson data "$data"              \
-      '{project_name: $project_name, change_id: $change_id, data: $data}'
+      "{project_name: \$project_name, change_id: \$change_id, data: \$data}"
 
