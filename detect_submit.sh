@@ -6,7 +6,7 @@
 #                    b. create a change with "Depends-On" for them
 #                    c. output a list of change IDs for new changes
 
-resubmit.sh - send revierify comment for a list	of changeIDs
+# resubmit.sh - send revierify comment for a list	of changeIDs
 
 
 DEFAULT_BRANCH=rhos-17.0-trunk-patches
@@ -162,7 +162,7 @@ for component in "${COMPONENTS_WITHOUT_CHANGE_ID[@]}"; do
     COMMIT_HASH="I"$random
     COMMIT_MSG="DNM [CRE] [OSPCRE-62] - Downstream component jobs
 
-This change is going to be abandined after the zuul job verificarion.
+This change is going to be abandoned after the zuul job verification.
 
 Depends-On: https://$gerrit/gerrit/c/openstack/osp-internal-jobs/+/303197
 
