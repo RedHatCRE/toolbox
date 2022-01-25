@@ -2,5 +2,5 @@
 host=review.gerrithub.io
 port=29418
 project=rhos-infra/cre.git
-defaultbranch=master
+defaultbranch=main
 
