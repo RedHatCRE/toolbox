@@ -15,4 +15,3 @@ $ ./get_gerrit_last_comment_by_data.sh --help
 Usage: ./get_gerrit_last_comment_by_data.sh [-u|--ssh_user USERNAME] [-p|--port NUM] [-s|--ssh_key_path PATH] [-H|--gerrit_host HOST] [-U|--gerrit_username USERNAME] [-C|--change_number NUM] [-g|--get-failure-jobs]
 ```
 
-

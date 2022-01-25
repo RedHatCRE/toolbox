@@ -5,7 +5,7 @@ if ! type jq >/dev/null 2>&1; then
     exit 1
 fi
 
-usage() { 
+usage() {
     echo "Usage: $0 [-u|--ssh_user USERNAME] [-p|--port NUM] [-s|--ssh_key_path PATH] [-H|--gerrit_host HOST] [-U|--gerrit_username USERNAME] [-C|--change_number NUM] [-g|--get-failure-jobs]"
     exit 2
 }
@@ -22,11 +22,11 @@ while [ $# -gt 0 ]; do
             gerrit_username=$2
             shift
             ;;
-        -C|--change_number) 
+        -C|--change_number)
             change_number=$2
             shift
             ;;
-        -p|--port) 
+        -p|--port)
             port=$2
             shift
             ;;
@@ -118,7 +118,7 @@ if [ ! -z "$get_failure_jobs" ]; then
     jq_extract_jobs_data_command=("jq" "-r" "'[.data | .[] | select(.status==\"FAILURE\")]'")
 fi
 
-data=$(echo "$last_comment" | column --table --table-columns TEST_NAME,URL,STATUS --json --table-name data | eval "${jq_extract_jobs_data_command[@]}") 
+data=$(echo "$last_comment" | column --table --table-columns TEST_NAME,URL,STATUS --json --table-name data | eval "${jq_extract_jobs_data_command[@]}")
 
 jq -n --arg project_name "$project_name"  \
       --arg change_id "$change_number"    \
