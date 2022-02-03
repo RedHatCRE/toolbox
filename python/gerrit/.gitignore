@@ -1,0 +1,10 @@
+## Pycharm
+.idea/**
+venv/**
+
+## Tox
+.tox/**
+
+# Coverage
+.coverage
+htmlcov/**
