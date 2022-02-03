@@ -16,6 +16,41 @@
       "message": "This change is too big imho. Can we split it into multiple separate changes?\nFor example one change will add tox.ini, another one will add basic folders structure, ... otherwise it makes life harder for reviewers to review everything at once.",
       "revId": "b86c3f6a29451034503dff79f7ed0accc5c82da7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47ba950e_97028a91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017875
+      },
+      "writtenOn": "2022-02-03T13:59:46Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "566f9c31_2bfd31e7",
+      "revId": "b86c3f6a29451034503dff79f7ed0accc5c82da7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e3d4954_5dd11a66",
+        "filename": "python/gerrit/.gitignore",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017875
+      },
+      "writtenOn": "2022-02-03T13:59:46Z",
+      "side": 1,
+      "message": "WOHA, this file is so huge...\n\nI am personally not a fan of such huge .gitignores from the project start, that include all possible and potential entries – such as for Java, C, Spyder and many other. I already lost too much time with my changes missing something because it was matched by one .gitignore entry (such as I can imagine here: lib/ and target/)\n\nAlso I just noticed it is ambiguous: why to specify all .idea/something, when line 87 lists `.idea/*`? But in line 251 there is `#.idea/`, so... should it be included, or excluded?",
+      "revId": "b86c3f6a29451034503dff79f7ed0accc5c82da7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
