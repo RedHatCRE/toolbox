@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "566f9c31_2bfd31e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1004788
+      },
+      "writtenOn": "2022-02-03T11:10:37Z",
+      "side": 1,
+      "message": "This change is too big imho. Can we split it into multiple separate changes?\nFor example one change will add tox.ini, another one will add basic folders structure, ... otherwise it makes life harder for reviewers to review everything at once.",
+      "revId": "b86c3f6a29451034503dff79f7ed0accc5c82da7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}
