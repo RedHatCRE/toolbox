@@ -79,12 +79,12 @@ fi
 ssh_command=("ssh" "-p" "$port" "$ssh_user@$gerrit_host")
 gerrit_command=( "gerrit" "query" "--comments" "change:$change_number" "--format=json" "commentby:$gerrit_username")
 
-if [ ! -z "$ssh_key_path" ]; then
+if [ -n "$ssh_key_path" ]; then
     if [ ! -f "$ssh_key_path" ]; then
         echo "SSH key '$ssh_key_path' not found"
         exit 2
     fi
-    ssh_command+=('-i' $ssh_key_path)
+    ssh_command+=('-i' "$ssh_key_path")
 fi
 
 review_data=$("${ssh_command[@]}" "${gerrit_command[@]}")
@@ -114,7 +114,7 @@ last_comment=$(jq -r 'last | .[]' <<< "$last_comment_review_info" \
                       | awk '/^-/{print $2,$3,$5}')
 
 jq_extract_jobs_data_command=("jq" "-c" ".[]")
-if [ ! -z "$get_failure_jobs" ]; then
+if [ -n "$get_failure_jobs" ]; then
     jq_extract_jobs_data_command=("jq" "-r" "'[.data | .[] | select(.status==\"FAILURE\")]'")
 fi
 
