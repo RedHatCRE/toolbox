@@ -104,13 +104,23 @@ declare -a CHANGE_IDs=(
    I09c4ac06111ad8f51f537809b397ff990e814dcb
 )
 
-for component in "${CHANGE_IDs[@]}"; do
+for chID in "${CHANGE_IDs[@]}"; do
+    echo "--------------------------------------------------"
+    echo ChangeID: "${chID}"
+
     SHA=$(ssh -p 29418 "${gerrit_user}@${gerrit_host}" \
-              gerrit query --patch-sets "${component}" \
-              | grep revision | awk '{print $2}')
-    echo "${SHA}"
+          gerrit query --patch-sets "${chID}" \
+          | grep revision | awk '{print $2}')
+    echo SHA: "${SHA}"
+
+
+    PRJ_N_BRANCH=$(ssh -p 29418 "${gerrit_user}@${gerrit_host}" \
+                   gerrit query "${chID}")
+
+    echo "${PRJ_N_BRANCH}" | grep branch
+    echo "${PRJ_N_BRANCH}" | grep project
 
     ssh -p 29418 "${gerrit_user}@${gerrit_host}" \
         gerrit review -m '"reverify test"' "${SHA}"
-    echo $?
+    echo "SSH command status": $?
 done
