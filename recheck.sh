@@ -114,7 +114,7 @@ for chID in "${CHANGE_IDs[@]}"; do
 
     SHA=$(ssh -p 29418 "${gerrit_user}@${gerrit_host}" \
           gerrit query --patch-sets "${chID}" \
-          | grep revision | awk '{print $2}')
+          | grep revision | awk '{print $2}' | tail -n 1)
     echo SHA: "${SHA}"
 
 
@@ -125,6 +125,6 @@ for chID in "${CHANGE_IDs[@]}"; do
     echo "${PRJ_N_BRANCH}" | grep project
 
     ssh -p 29418 "${gerrit_user}@${gerrit_host}" \
-        gerrit review -m '"reverify test"' "${SHA}"
+        gerrit review --rebase --message '"reverify test"' "${SHA}"
     echo "SSH command status": $?
 done
