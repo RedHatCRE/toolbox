@@ -6,13 +6,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: alpine:latest 
+      image: alpine:latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.0.0
-      - name: Package installation
-        run: apk add --no-cache shellcheck python3 py3-pip && pip3 install tox
-      - name: Shellcheck call tests
+        uses: actions/checkout@v3
+      - name: Packages
+        run: apk add --no-cache git shellcheck python3 py3-pip && pip3 install tox
+      - name: Shellcheck
         run: shellcheck --shell=bash *.sh
-      - name: Tox call tests
-        run: tox -v
+      - name: Tox
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          tox -v
