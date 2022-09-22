@@ -118,7 +118,7 @@ if [ -n "$get_failure_jobs" ]; then
     jq_extract_jobs_data_command=("jq" "-r" "'[.data | .[] | select(.status==\"FAILURE\")]'")
 fi
 
-data=$(echo "$last_comment" | column --table --table-columns TEST_NAME,URL,STATUS --json --table-name data | eval "${jq_extract_jobs_data_command[@]}")
+data=$(echo "$last_comment" | column --table --table-columns TEST_NAME,URL,STATUS --json --table-name data | "${jq_extract_jobs_data_command[@]}")
 
 jq -n --arg project_name "$project_name"  \
       --arg change_id "$change_number"    \

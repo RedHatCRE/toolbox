@@ -1,6 +1,8 @@
-name: CI
+name: tests
 
-on: [push, pull_request]
+on:
+  - push
+  - pull_request
 
 jobs:
   test:
@@ -8,13 +10,13 @@ jobs:
     container:
       image: alpine:latest
     steps:
+      - name: Packages
+        run: |
+          apk add findutils git python3 py3-pip shellcheck
+          pip3 install tox
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Packages
-        run: apk add --no-cache git shellcheck python3 py3-pip && pip3 install tox
-      - name: Shellcheck
-        run: shellcheck --shell=bash *.sh
       - name: Tox
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
           tox -v
