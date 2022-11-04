@@ -1,0 +1,49 @@
+---
+- name: Include variables based on distribution
+  ansible.builtin.include_vars:
+    file: "{{ansible_distribution | lower }}.yaml"
+
+- name: Add GPG docker public repository key
+  ansible.builtin.get_url:
+    url: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+    dest: /etc/apt/trusted.gpg.d/docker.asc
+    mode: '0644'
+    force: true
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add docker repository into sources list and update package manager
+  block:
+    - name: Add DEB
+      ansible.builtin.apt_repository:
+        repo: "deb [arch={{ repository_architecture }} signed-by=/etc/apt/trusted.gpg.d/docker.asc] {{ docker_download_base_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+        update_cache: true
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - name: Add YUM
+      ansible.builtin.yum_repository:
+        name: docker
+        baseurl: "{{ docker_download_base_url }} "
+      when: ansible_distribution == 'Fedora'
+
+
+- name: Update package manager cache
+  block:
+    - name: Update dnf cache
+      ansible.builtin.dnf:
+        update_cache: yes
+      when: ansible_pkg_mgr == "dnf"
+    - name: Update yum cache
+      ansible.builtin.yum:
+        update_cache: yes
+      when: ansible_pkg_mgr == "yum"
+
+- name: Install docker package dependencies
+  ansible.builtin.package:
+    name: "{{ docker_dependency_packages }}"
+    state: present
+
+- name: Install docker packages by distribution
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: present
