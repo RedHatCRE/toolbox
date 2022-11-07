@@ -1,27 +1,30 @@
 ---
 - name: Include variables based on distribution
   ansible.builtin.include_vars:
-    file: "{{ansible_distribution | lower }}.yaml"
+    file: "{{ ansible_distribution | lower }}.yaml"
 
 - name: Add GPG docker public repository key
   block:
     - name: Add Debian/Ubuntu
       ansible.builtin.get_url:
-        url: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+        url: "{{ docker_download_base_url }}/{{ ansible_distribution | lower }}/gpg"
         dest: /etc/apt/trusted.gpg.d/docker.asc
         mode: '0644'
         force: true
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - name: Add Fedora
       ansible.builtin.rpm_key:
-        key: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+        key: "{{ docker_download_base_url }}/{{ ansible_distribution | lower }}/gpg"
         state: present
+      when: ansible_distribution == 'Fedora'
 
 - name: Add docker repository into sources list and update package manager
   block:
     - name: Add deb repository
       ansible.builtin.apt_repository:
-        repo: "deb [arch={{ repository_architecture }} signed-by=/etc/apt/trusted.gpg.d/docker.asc] {{ docker_download_base_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+        repo: >-
+          deb [arch={{ repository_architecture }} signed-by=/etc/apt/trusted.gpg.d/docker.asc]
+          {{ docker_download_base_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
         state: present
         filename: docker
         update_cache: true
@@ -30,10 +33,10 @@
       ansible.builtin.yum_repository:
         name: docker
         description: docker repository
-        baseurl: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/$releasever/$basearch/stable"
+        baseurl: "{{ docker_download_base_url }}/{{ ansible_distribution | lower }}/$releasever/$basearch/stable"
         enabled: true
         gpgcheck: true
-        gpgkey: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+        gpgkey: "{{ docker_download_base_url }}/{{ ansible_distribution | lower }}/gpg"
       when: ansible_distribution == 'Fedora'
 
 - name: Install docker package dependencies
