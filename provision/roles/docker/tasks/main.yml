@@ -4,39 +4,37 @@
     file: "{{ansible_distribution | lower }}.yaml"
 
 - name: Add GPG docker public repository key
-  ansible.builtin.get_url:
-    url: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
-    dest: /etc/apt/trusted.gpg.d/docker.asc
-    mode: '0644'
-    force: true
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  block:
+    - name: Add Debian/Ubuntu
+      ansible.builtin.get_url:
+        url: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+        mode: '0644'
+        force: true
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - name: Add Fedora
+      ansible.builtin.rpm_key:
+        key: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
+        state: present
 
 - name: Add docker repository into sources list and update package manager
   block:
-    - name: Add DEB
+    - name: Add deb repository
       ansible.builtin.apt_repository:
         repo: "deb [arch={{ repository_architecture }} signed-by=/etc/apt/trusted.gpg.d/docker.asc] {{ docker_download_base_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
         state: present
         filename: docker
         update_cache: true
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - name: Add YUM
+    - name: Add yum repository
       ansible.builtin.yum_repository:
         name: docker
-        baseurl: "{{ docker_download_base_url }} "
+        description: docker repository
+        baseurl: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/$releasever/$basearch/stable"
+        enabled: true
+        gpgcheck: true
+        gpgkey: "{{ docker_download_base_url }}/{{ansible_distribution | lower }}/gpg"
       when: ansible_distribution == 'Fedora'
-
-
-- name: Update package manager cache
-  block:
-    - name: Update dnf cache
-      ansible.builtin.dnf:
-        update_cache: yes
-      when: ansible_pkg_mgr == "dnf"
-    - name: Update yum cache
-      ansible.builtin.yum:
-        update_cache: yes
-      when: ansible_pkg_mgr == "yum"
 
 - name: Install docker package dependencies
   ansible.builtin.package:
