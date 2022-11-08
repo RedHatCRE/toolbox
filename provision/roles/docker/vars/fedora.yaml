@@ -1,0 +1,10 @@
+---
+docker_dependency_packages:
+  - dnf-plugins-core
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+
+docker_download_base_url: "https://download.docker.com/linux"

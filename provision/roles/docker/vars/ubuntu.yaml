@@ -1,0 +1,17 @@
+---
+docker_dependency_packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+
+docker_download_base_url: "https://download.docker.com/linux"
+
+architecture_translation:
+  x86_64: amd64
+  amd64: amd64
