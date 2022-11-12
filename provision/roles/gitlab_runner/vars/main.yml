@@ -1,0 +1,3 @@
+---
+gitlab_url: "http://gitlab.example.com"
+runner_registration_token: "token"
