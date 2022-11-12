@@ -39,7 +39,7 @@
       when: ansible_distribution == 'Fedora'
 
 - name: Register runner in GitLab provided instance
-  command: |
+  ansible.builtin.command: |
     gitlab-runner register \
     --non-interactive \
     --url "{{ gitlab_url }}" \
@@ -55,6 +55,6 @@
   changed_when: register_output.rc != 0
 
 - name: Start runner
-  command: gitlab-runner start
+  ansible.builtin.command: gitlab-runner start
   register: runner_start_output
   changed_when: runner_start_output.rc != 0
