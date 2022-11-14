@@ -1,0 +1,14 @@
+---
+gitlab_url: "https://gitlab.com/"
+runner_executor: "docker"
+runner_description: "Tagged runner"
+runner_tag_list: "tagged"
+run_untagged: "false"
+docker_image: "ubuntu22:latest"
+
+architecture_translation:
+  x86_64: amd64
+  amd64: amd64
+
+repository_architecture: "{{ architecture_translation[ansible_architecture] }}"
+gpg_public_key: "https://packages.gitlab.com/runner/gitlab-runner/gpgkey/runner-gitlab-runner-4C80FB51394521E9.pub.gpg"

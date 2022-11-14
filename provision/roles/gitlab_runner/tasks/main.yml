@@ -1,0 +1,60 @@
+---
+- name: Include variables based on distribution
+  ansible.builtin.include_vars:
+    file: "{{ ansible_distribution | lower }}.yaml"
+
+- name: Check if required variables are not empty
+  ansible.builtin.fail:
+    msg: "The variable {{ item }} is empty"
+  when: item | length == 0
+  loop:
+    - gitlab_url
+    - runner_registration_token
+
+- name: Add GPG gitlab runner public repository key
+  block:
+    - name: Add GPG gitlab runner Debian/Ubuntu
+      ansible.builtin.get_url:
+        url: "{{ gpg_public_key }}"
+        dest: /etc/apt/trusted.gpg.d/gitlab_runner.asc
+        mode: '0644'
+        force: true
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - name: Add GPG gitlab runner Fedora
+      ansible.builtin.rpm_key:
+        key: "{{ gpg_public_key }}"
+        state: present
+      when: ansible_distribution == 'Fedora'
+
+- name: Install gitlab-runner from remote URL
+  block:
+    - name: Install deb package
+      ansible.builtin.apt:
+        deb: "{{ gitlab_runner_download_base_url }}"
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - name: Install rpm package
+      ansible.builtin.yum:
+        name: "{{ gitlab_runner_download_base_url }}"
+        state: present
+      when: ansible_distribution == 'Fedora'
+
+- name: Register runner in GitLab provided instance
+  ansible.builtin.command: |
+    gitlab-runner register \
+    --non-interactive \
+    --url "{{ gitlab_url }}" \
+    --registration-token "{{ runner_registration_token }}" \
+    --executor "{{ runner_executor }}" \
+    --docker-image "{{ docker_image }}" \
+    --description "{{ runner_description }}" \
+    --tag-list "{{ runner_tag_list }}" \
+    --run-untagged="{{ run_untagged }}" \
+    --locked="true" \
+    --access-level="ref_protected"
+  register: register_output
+  changed_when: register_output.rc != 0
+
+- name: Start runner
+  ansible.builtin.command: gitlab-runner start
+  register: runner_start_output
+  changed_when: runner_start_output.rc != 0
