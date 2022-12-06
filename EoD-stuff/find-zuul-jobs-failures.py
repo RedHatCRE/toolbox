@@ -197,6 +197,8 @@ def find_failure_reason(url: str):
 
 
 def get_bad_results(builds: list[Build]) -> dict:
+    successes = sum([build.result == 'SUCCESS' for build in builds])
+
     builds = [build for build in builds
               if (build.result not in ('SUCCESS', '---')
                   and build.log_url != '')]
@@ -222,7 +224,8 @@ def get_bad_results(builds: list[Build]) -> dict:
         i += 1
         progress(i, end)
 
-    print('Number of failed builds:', len(results))
+    failures = len(results)
+    print('Number of failed builds:', failures, '/', failures + successes)
 
     return results
 
