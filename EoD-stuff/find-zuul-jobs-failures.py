@@ -102,6 +102,12 @@ def get_builds() -> list:
             for pipeline in PIPELINES:
                 for job in JOBS:
                     build = get_last_build(project, branch, pipeline, job)
+                    date = build.get('start_time', '')
+
+                    if date and (datetime.now()
+                                 - datetime.fromisoformat(date)).days > 14:
+                        build['result'] = '---'
+                        build['log_url'] = ''
 
                     builds.append(Build(
                         project=project,
