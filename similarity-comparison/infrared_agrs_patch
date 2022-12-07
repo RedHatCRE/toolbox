@@ -1,0 +1,36 @@
+diff --git a/infrared/api.py b/infrared/api.py
+index e88b2949..6fc7f77a 100644
+--- a/infrared/api.py
++++ b/infrared/api.py
+@@ -116,6 +116,12 @@ class InfraredPluginsSpec(SpecObject):
+         # unpack parsed arguments
+         nested_args, control_args, custom_args = parsed_args
+ 
++        # print to stdout and serialize nested agruments. Finally, terminate.
++        import pickle
++        print (nested_args)
++        with open('nested_args.pkl', 'wb') as f:
++            pickle.dump(nested_args, f)
++        exit(0)
+         if control_args.get('debug', None):
+             logger.LOG.setLevel(logging.DEBUG)
+ 
+@@ -198,12 +204,18 @@ class SpecManager(object):
+ 
+     def run_specs(self, args=None):
+         spec_args = vars(self.parser.parse_args(args))
++        print(spec_args)
+         subcommand = spec_args.get('subcommand', '')
+         if not spec_args.get('no_log_commands'):
+             if self.execution_logger is None:
+                 self.execution_logger = CoreServices.execution_logger_manager()
+             self.execution_logger.command()
+ 
++        # serialize subcommand
++        import pickle
++        with open('subcommand.pkl', 'wb') as f:
++            pickle.dump(subcommand, f)
++
+         if subcommand in self.spec_objects:
+             return self.spec_objects[subcommand].spec_handler(
+                 self.parser, args=args)

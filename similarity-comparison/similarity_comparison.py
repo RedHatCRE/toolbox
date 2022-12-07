@@ -1,10 +1,16 @@
 import configparser
 import json
+import logging
+import os.path
 import re
 import requests
 import sqlite3
+import subprocess
+import sys
 import xlsxwriter
 
+from git import Repo
+from io import StringIO
 from os.path import expanduser
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -20,6 +26,14 @@ httpRequest = {
         "/job/{jobName}/lastSuccessfulBuild/artifact/{artifactPath}"
 }
 
+
+def get_base_prefix_compat():
+    """Get base/real prefix, or sys.prefix if there is none."""
+    return getattr(sys, "base_prefix", None) or getattr(sys, "real_prefix",
+                                                        None) or sys.prefix
+
+def in_virtualenv():
+    return get_base_prefix_compat() != sys.prefix
 
 # JJSC - Jenkins Jobs Similarity Computation
 class JJSC(object):
@@ -47,11 +61,88 @@ class JJSC(object):
 
         self.workbook = xlsxwriter.Workbook('jjs.xlsx')
 
+        logging.basicConfig(filename='sc.log',
+                            level=logging.WARNING,
+                            format='%(levelname)s %(asctime)s\n%(message)s\n',
+                            datefmt='%Y-%m-%d %H:%M:%S')
+
     def __del__(self):
         if self.dbcon:
             self.dbcon.close()
             print("The SQLite connection is closed")
         self.workbook.close()
+
+    def _prepare_arg_parsing_and_serialization(self):
+        # clone infrared
+        git_url = "https://github.com/redhat-openstack/infrared.git"
+        repo_dir = "/tmp/infrared"
+
+        if os.path.exists(repo_dir):
+            return
+        subprocess.call("rm -rf " + repo_dir, shell=True)
+        Repo.clone_from(git_url, repo_dir)
+
+        # apply the arg serialization patch
+        command = "cp infrared_agrs_patch " +  repo_dir + ";" + \
+                  "cd " + repo_dir + ";" + \
+                  "git apply infrared_agrs_patch"
+        subprocess.call(command, shell=True)
+
+        #install infarred in a virtual environment
+        if (not in_virtualenv()):
+            raise Exception("This code installs pip packages and is " + \
+                  "adviced to be executed in a virtual environment")
+
+        command = "cd " + repo_dir + ";" + \
+                  "pip install - U pip;" + \
+                  "pip install ."
+        subprocess.call(command, shell=True)
+
+        # add additional plugins for enhanced parsing
+        subprocess.call("infrared plugin add all", shell=True)
+
+    def _extract_ir_commands(self, file_context: str):
+        i = 0
+        extracts = []
+        REGEXP_START = r"\s*(infrared|ir)"
+        pattern_start = re.compile(REGEXP_START)
+
+        # reformat file content to un-split multiline bash commands
+        file = StringIO(file_context.replace("\\\n", " "))
+
+        for line in file:
+            i += 1  # line counting starts with 1
+            if pattern_start.match(line):
+                extracts.append((i, line.rstrip('\n')))
+
+        for line in extracts:
+
+            status, output = subprocess.getstatusoutput(line[1])
+            output = line[1].strip() + "\n" + output
+            print (output)
+            if status != 0:
+                logging.warning(output)
+    def _print_parsed_paramters(self):
+        # fetch unified jobs
+        sql_command = \
+            'SELECT DISTINCT * FROM jjs WHERE jobName LIKE ' + \
+            '\'%DFG%\' AND jobName LIKE \'%unified%\' ORDER BY jobName'
+        unifiedJobs = self._fetch_jobs_from_DB(sql_command)
+        print("Total of unified jobs are:  ", len(unifiedJobs))
+
+        for rowUnified in unifiedJobs:
+            jobNameUnified = str(rowUnified[0])
+            print(len(unifiedJobs))
+
+            releaseUnified = self._extractVersionFromJobName(
+                jobNameUnified)
+            ipVersionUnifed = self._extractIPVersionFromJobName(
+                jobNameUnified)
+
+            file_content = str(rowUnified[1])
+
+            print(self._extract_ir_commands(file_content))
+
 
     def _insertDataIntoTable(self, jobName, artifatcContent):
         try:
@@ -155,15 +246,19 @@ class JJSC(object):
 
         return (len(intersestoin) > 0)
 
-    def analyseJJSTable(self):
+    def _fetch_jobs_from_DB(self, sql_command):
         cursor = self.dbcon.cursor()
+        cursor.execute(sql_command)
+        jobs = cursor.fetchall()
+        cursor.close()
+        return jobs
 
+    def analyseJJSTable(self):
         # fetch unified jobs
         sql_command = \
             'SELECT DISTINCT * FROM jjs WHERE jobName LIKE ' + \
             '\'%unified%\' AND jobName LIKE \'%director%\' ORDER BY jobName'
-        cursor.execute(sql_command)
-        unifiedJobs = cursor.fetchall()
+        unifiedJobs = self._fetch_jobs_from_DB(sql_command)
         print("Total of unified jobs are:  ", len(unifiedJobs))
 
         # fetch other director jobs (including unified ones) to compare
@@ -171,8 +266,7 @@ class JJSC(object):
         sql_command = \
             'SELECT DISTINCT * FROM jjs WHERE jobName LIKE ' + \
             '\'%director%\' AND jobName NOT LIKE \'%compact%\''
-        cursor.execute(sql_command)
-        directorJobs = cursor.fetchall()
+        directorJobs = self._fetch_jobs_from_DB(sql_command)
         print("Total of director jobs are:  ", len(directorJobs))
 
         unifiedJobsCounter = 0
@@ -249,12 +343,20 @@ class JJSC(object):
                         except Exception as e:
                             print(e)
                             continue
-        cursor.close()
+
 
 
 credentialsPath = expanduser("~") + '/.config/jenkins_jobs/jenkins_jobs.ini'
 artifactPath = '.sh/run.sh'
 jjsc = JJSC(credentialsPath, artifactPath)
-jjsc.populateDB()
-jjsc.analyseJJSTable()
+
+
+
+#jjsc.populateDB()
+#jjsc.analyseJJSTable()
+
+jjsc._prepare_arg_parsing_and_serialization()
+jjsc._print_parsed_paramters()
+
+
 del jjsc
