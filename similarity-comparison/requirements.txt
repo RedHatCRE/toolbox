@@ -1,3 +1,4 @@
+gitpython
 requests
-xlsxwriter
 scikit-learn
+xlsxwriter
