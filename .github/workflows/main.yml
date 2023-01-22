@@ -13,7 +13,7 @@ jobs:
       - name: Packages
         run: |
           apk add findutils git python3 py3-pip shellcheck
-          pip3 install tox
+          pip3 install tox<4
       - name: Checkout
         uses: actions/checkout@v3
       - name: Tox
