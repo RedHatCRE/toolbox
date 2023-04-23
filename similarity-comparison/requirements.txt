@@ -1,0 +1,4 @@
+gitpython
+requests
+scikit-learn
+xlsxwriter
